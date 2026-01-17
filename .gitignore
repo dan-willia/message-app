@@ -5,9 +5,11 @@
 
 *.pyc
 __pycache__/
+.DS_STORE
 
-backend-research/
-feature_specs/
+backend/.DS_Store
+backend/backend-research/
+backend/feature_specs/
 
 backend/instance/*
 !backend/instance/messenger_app.sqlite
@@ -20,5 +22,6 @@ htmlcov/
 dist/
 build/
 *.egg-info/
+
 
 .ipynb_checkpoints

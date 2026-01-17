@@ -22,7 +22,7 @@ Before starting up the server you must initialize the database. Do so with
 If you commit anything to the database, you can clear it by running the command again. 
 
 To start the server, do
-```python3 run.py```
+```flask --app message_app run --debug```
 
 To run the tests, do
 ```pytest```
