@@ -1,0 +1,9 @@
+Status reporting
+  - No error messages reported to user on failed registration or login, only messages in console. Add a message below the black text input bars.
+  - Change status confirmations from browser-popup messages.
+
+Appearance
+  - Add name of app at top of every page: MessageApp
+
+Development
+  - Add fake users and message history
