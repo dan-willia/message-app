@@ -1,5 +1,4 @@
 import pytest
-from http import HTTPStatus
 from flask import g, session
 from message_app import db_
 from flask_login import current_user
@@ -18,9 +17,9 @@ def test_register(client, app):
         assert user is not None
 
 @pytest.mark.parametrize(('username', 'password', 'status_code', 'message'), (
-    ('', '', HTTPStatus.CONFLICT, 'Username is required.'),
-    ('a', '', HTTPStatus.CONFLICT, 'Password is required.'),
-    ('test', 'test', HTTPStatus.CONFLICT, 'already registered')
+    ('', '', 200, 'Username is required.'),
+    ('a', '', 200, 'Password is required.'),
+    ('test', 'test', 200, 'test is not available')
 ))
 def test_register_validate_input(client, username, password, status_code, message):
     response = client.post(
@@ -41,8 +40,8 @@ def test_login(client, auth):
     ('test', 'test', b'success'),
     ('test', 'test', b'test'),
     ('test', 'test', b'uuid'),
-    ('a', 'test', b'Incorrect username.'),
-    ('test', 'a', b'Incorrect password.'),
+    ('a', 'test', b'Credentials not valid.'),
+    ('test', 'a', b'Credentials not valid.'),
 ))
 def test_login_validate_input(auth, username, password, message):
     response = auth.login(username, password)

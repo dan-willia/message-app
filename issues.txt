@@ -12,3 +12,6 @@ Maintenance
 
 Feature
   - Allow users to edit their profile names
+
+Structure
+  - Backend
