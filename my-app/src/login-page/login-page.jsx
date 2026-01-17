@@ -36,8 +36,8 @@ function LoginPage() {
                 navigate('/contacts')
             } else {            
                 clearUser();
-                setError(`Login error with msg: ${data.message}`)               // Flask should tell us here that the credentials and invalid
-                console.log(data)                                               // for testing - this shows us Flask's response
+                setError(`${data.error}`)               // Flask should tell us here that the credentials and invalid
+                console.log(data)                         // for testing - this shows us Flask's response
             }
         } catch (err) {
             setError('Server Error: no response from Flask')
@@ -62,6 +62,8 @@ function LoginPage() {
                 <Link to="/register">
                     <button className="loginButton">need to register?</button>
                 </Link>
+                <br />
+                <p className="error-message">{error}</p>
             </form>
         </div>
     )

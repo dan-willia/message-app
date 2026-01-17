@@ -28,7 +28,7 @@ function RegisterPage() {
             alert("Registration success!");
             navigate('/login')                                  // if successful, return to login page
         } else {            
-            setError(`Register error with msg: ${data.message}`)// Flask should tell us here that the credentials are invalid and why
+            setError(`${data.error}`)// Flask should tell us here that the credentials are invalid and why
         }
     } catch (err) {
         setError('Server Error: no response from Flask')
@@ -50,6 +50,7 @@ function RegisterPage() {
                 <br />
                 <button className="register-button" type ="submit" onClick={handleRegister}>register</button>
                 <br />
+                <p className='error-message'>{error}</p>
             </form>
         </div>
     )

@@ -1,9 +1,14 @@
 Status reporting
-  - No error messages reported to user on failed registration or login, only messages in console. Add a message below the black text input bars.
-  - Change status confirmations from browser-popup messages.
+  - Change status confirmations from browser alerts messages.
 
 Appearance
-  - Add name of app at top of every page: MessageApp
+  - Add name of app at top of every page (MessageApp) for branding and as defacto 'back' button on registration page.
 
 Development
-  - Add fake users and message history
+  - Add fake users and message history to have more robust demo of capabilities and look and feel.
+
+Maintenance
+  - Add logger to make operations of the app more transparent. 
+
+Feature
+  - Allow users to edit their profile names
