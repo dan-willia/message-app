@@ -13,6 +13,11 @@ cd backend/
 flask --app message_app run
 ```
 
+This flask command creates six fake accounts with message history.
+```bash
+flask --app message_app seed-data
+```
+
 Change into my-app dir and start front end server.
 ```bash
 cd ../my-app/
@@ -25,7 +30,7 @@ Go to [localhost:5173](http://localhost:5173/)
 <img src="img/login.png" alt="drawing" width="400"/>
 
 ## User landing page
-<img src="img/landing.png" alt="drawing" width="400"/>
+<img src="img/contacts.png" alt="drawing" width="400"/>
 
 ## Chat page
 <img src="img/chat.png" alt="drawing" width="400"/>

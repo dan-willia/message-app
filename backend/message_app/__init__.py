@@ -84,6 +84,9 @@ def create_app(test_config=None, config_name=None):
     from . import db
     db.init_app(app)
 
+    from . import seed_demo
+    seed_demo.init_app(app)
+
     from . import auth
     app.register_blueprint(auth.bp)
 
