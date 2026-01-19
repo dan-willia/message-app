@@ -19,8 +19,7 @@ The fixtures like app, auth, client are used as arguments for test functions.
 def app():
     db_fd, db_path = tempfile.mkstemp()
 
-    app = create_app({
-        'TESTING': True,
+    app = create_app(test_config={
         'SQLALCHEMY_DATABASE_URI': f'sqlite:///{db_path}',
     })
 

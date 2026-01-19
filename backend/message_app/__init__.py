@@ -1,66 +1,62 @@
-import os
-
 from flask import Flask
 from flask_cors import CORS
-from flask_sqlalchemy import SQLAlchemy
-from flask_socketio import SocketIO
 from flask_login import LoginManager
-from message_app.prefix import PrefixMiddleware
+from flask_socketio import SocketIO
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import select
+import os
+
+from .config import config, DevelopmentConfig
 
 # Create instance of SocketIO: not yet bound to any Flask app
 # server attribute is None b/c there is no app to serve
-socketio = SocketIO(logger=True, engineio_logger=True, cors_allowed_origins=["http://localhost:5173"])
+# Note: cors_allowed_origins will be updated in create_app based on config
+socketio = SocketIO()
 print(f"SocketIO created at module level: {socketio}")
 db_ = SQLAlchemy()
 
-def create_app(test_config=None):
+def create_app(test_config=None, config_name=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     print(f"Flask app created: {hex(id(app))} ")
-    # Bind SocketIO instance to our app
-    #   - register SocketIO handlers with our app
-    #   - set up necessary routes for WebSocket connections
-    #   - does NOT start the server: SocketIO is configured but not running
-    socketio.init_app(app)
-    print(f"SocketIO object initialized in create_app(): {app.extensions['socketio']}")
-
-    # Get the database URL from environment
-    database_url = os.environ.get(
-        'DATABASE_URL',
-        f"sqlite:///{os.path.join(app.instance_path, 'messenger.db')}"
-    )
-        
-    # Render's PostgreSQL URLs start with 'postgres://' but SQLAlchemy 1.4+ expects 'postgresql://'
-    if database_url.startswith('postgres://'):
-        database_url = database_url.replace('postgres://', 'postgresql://', 1)
-
-    app.config.from_mapping(
-        SECRET_KEY='dev',
-        SESSION_COOKIE_SAMESITE='None', # Necessary for cross-origin which we have b/c Flask/React are on different servers
-        SESSION_COOKIE_SECURE=True,    # Needs to be true: means that user data can only be sent over HTTPS
-        SQLALCHEMY_DATABASE_URI=database_url,
-        SQLALCHEMY_TRACK_MODIFICATIONS=False
-    )
-    
-    db_.init_app(app)
-    print(db_, "initialized at", f"{hex(id(db_))}")
-
-    if test_config is None:
-        # load the instance config, if it exists, when not testing
-        app.config.from_pyfile('config.py', silent=True)
-    else:
-        # load the test config if passed in
-        app.config.from_mapping(test_config)
 
     # ensure the instance folder exists
     try:
         os.makedirs(app.instance_path)
     except OSError:
         pass
-    
+
+    # Determine which config to use
+    if test_config is not None:
+        # Testing: use provided test config dict
+        app_config = config['testing']
+        app.config.from_object(app_config)
+        app.config.from_mapping(test_config)
+    else:
+        # Use config_name or default to environment variable or 'development'
+        config_name = config_name or os.environ.get('FLASK_ENV', 'development')
+        app_config = config.get(config_name, config['default'])
+        app.config.from_object(app_config)
+        # Load instance config if it exists
+        app.config.from_pyfile('config.py', silent=True)
+
+    # Set database URL
+    app.config['SQLALCHEMY_DATABASE_URI'] = app_config.get_database_url(app.instance_path)
+
+    db_.init_app(app)
+    print(db_, "initialized at", f"{hex(id(db_))}")
+
+    # Initialize SocketIO with config values
+    socketio.init_app(
+        app,
+        logger=app.config.get('SOCKETIO_LOGGER', False),
+        engineio_logger=app.config.get('ENGINEIO_LOGGER', False),
+        cors_allowed_origins=app.config.get('CORS_ORIGINS', ['http://localhost:5173'])
+    )
+    print(f"SocketIO object initialized in create_app(): {app.extensions['socketio']}")
+
     # Allow requests from React
-    CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
+    CORS(app, supports_credentials=True, origins=app.config.get('CORS_ORIGINS', ['http://localhost:5173']))
     # print("CORS configured")
 
     # Initialize Flask-Login
