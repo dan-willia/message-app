@@ -1,5 +1,5 @@
 # MessageApp
-Simple messaging application that supports contacts and stable message history. 
+Simple messaging application that supports real-time chatting, contacts, search, and stable message history.
 
 # To run
 Clone into local environment.
