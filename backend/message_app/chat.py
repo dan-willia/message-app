@@ -1,3 +1,5 @@
+import logging
+
 from flask import Blueprint, jsonify
 from flask_login import login_required, current_user
 from message_app import db_
@@ -6,6 +8,8 @@ from message_app import socketio
 from sqlalchemy import insert, select, func, or_
 from flask_socketio import join_room, emit, send
 from .decorators import contact_required
+
+logger = logging.getLogger(__name__)
 
 bp = Blueprint('chat', __name__)
 
@@ -134,9 +138,9 @@ def handle_chat_connect():
         Allow real-time connections for logged-in users only.
     """
     if not current_user.is_authenticated:
-        print("Rejected unauthenticated connection")
+        logger.warning("Rejected unauthenticated WebSocket connection")
         return False
-    print(f"User {current_user.user_name} connected to chat namespace")
+    logger.info(f"User '{current_user.user_name}' connected to chat namespace")
     return True
 
 @socketio.on('join', namespace='/chat')
@@ -154,7 +158,7 @@ def on_join(data):
     # - should authenticate that user has permission to access the room
     room = data['room']
     join_room(room)
-    print(f"{current_user.user_name} joined room {room}")
+    logger.info(f"User '{current_user.user_name}' joined room {room}")
     emit('room_joined', {'room': room})
 
 # Handler for send events
@@ -218,7 +222,7 @@ def on_message(json):
         send(data, broadcast=True, to=room_id)
         
     except Exception as e:
-        print(f'Database error when saving message: {e}')
+        logger.error(f"Database error when saving message: {e}")
         db_.session.rollback()
         emit('error', {'message': 'Failed to send message. Please try again.'}, broadcast=False)
         
@@ -227,9 +231,9 @@ def handle_disconnect():
     """
         When a user navigates away, closes the tab, or loses internet connection,
         the WebSocket connection will automatically close.
-        This handler simply prints the fact that the event happened. More useful 
-        logging can be added later. 
-        We can log things like the reason for the disconnect, the time of the 
-        disconnect ("last seen" feature), debugging info, etc. 
+        We log the disconnect event for debugging and potential "last seen" features.
     """
-    print(f'User {current_user.user_name} disconnect from chat')
+    if current_user.is_authenticated:
+        logger.info(f"User '{current_user.user_name}' disconnected from chat")
+    else:
+        logger.debug("Anonymous user disconnected from chat")

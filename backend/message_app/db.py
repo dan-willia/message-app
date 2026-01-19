@@ -1,3 +1,5 @@
+import logging
+
 from flask_sqlalchemy import SQLAlchemy
 from .data_classes import Contact, User
 from sqlalchemy import create_engine, select, exists
@@ -9,6 +11,8 @@ from flask import g
 from flask import current_app
 
 from message_app import db_
+
+logger = logging.getLogger(__name__)
 
 def get_db():
 	return db_
@@ -51,7 +55,7 @@ def has_contact(user, contact):
 				)
 		)
 	except SQLAlchemyError as e:
-		print(f"Database error in has_contact: {e}")
+		logger.error(f"Database error in has_contact: {e}")
 		return False
 		
 
@@ -60,7 +64,7 @@ def get_user_by_name(username):
 	try:
 		return db_.session.scalar(select(User).where(User.user_name == username))
 	except SQLAlchemyError as e:
-		print(f'Database error in get_user_by_name: {e}')
+		logger.error(f"Database error in get_user_by_name: {e}")
 		return None
 
 def add_contact(user, contact):

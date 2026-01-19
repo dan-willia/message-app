@@ -19,6 +19,10 @@ class Config:
     SOCKETIO_LOGGER = False
     ENGINEIO_LOGGER = False
 
+    # Logging
+    LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
+    LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+
     @staticmethod
     def get_database_url(instance_path):
         """Get database URL with Render PostgreSQL compatibility."""
@@ -37,6 +41,7 @@ class DevelopmentConfig(Config):
     DEBUG = True
     SOCKETIO_LOGGER = True
     ENGINEIO_LOGGER = True
+    LOG_LEVEL = 'DEBUG'
 
 
 class ProductionConfig(Config):

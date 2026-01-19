@@ -19,6 +19,9 @@ backend/instance/*
 .coverage
 htmlcov/
 
+# Logs
+backend/logs/
+
 dist/
 build/
 *.egg-info/
